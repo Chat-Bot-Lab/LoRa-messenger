@@ -80,7 +80,7 @@ class LoRaMessenger(QMainWindow):
             return
         try:
             self.serial.write(message.encode())
-            log.info("Сообщение %s отправлено", message)
+            log.info("Сообщение <<< %s >>> отправлено", message)
             self.ui.messageInputField.clear()
         except Exception as e:
             log.info(e)
