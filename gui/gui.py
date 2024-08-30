@@ -23,7 +23,6 @@ class LoRaMessenger(QMainWindow):
         self.timer.timeout.connect(self.readSerial)
         self.timer.start(100)
 
-
     def initUI(self):
         """Инициализация пользовательского интерфейса."""
         self.ui = uic.loadUi("gui/design.ui", self)
