@@ -7,6 +7,8 @@ from PyQt6.QtCore import QIODevice, QTimer
 from PyQt6.QtSerialPort import QSerialPort, QSerialPortInfo
 from PyQt6.QtWidgets import QMainWindow
 
+from utils.encryption import encrypt, decrypt
+
 log = logging.getLogger(__name__)
 
 
@@ -67,19 +69,22 @@ class LoRaMessenger(QMainWindow):
             data = self.serial.readLine()
             if data:
                 str_data = data.data().decode().strip()
+                log.info("Получено сообщение <<< %s >>>", str_data)
+                decrypted_data = decrypt(str_data)
 
-                self.ui.messageListWidget.addItem(str_data)
+                self.ui.messageListWidget.addItem(decrypted_data)
             else:
                 pass
 
     def sendMessage(self):
         """Отправить сообщение"""
         message = self.ui.messageInputField.text()
+        encrypted_message = encrypt(message)
         if not self.serial.isOpen():
             log.warning("Порт не открыт. Соединение не установлено.")
             return
         try:
-            self.serial.write(message.encode())
+            self.serial.write(encrypted_message.encode())
             log.info("Сообщение <<< %s >>> отправлено", message)
             self.ui.messageInputField.clear()
         except Exception as e:
