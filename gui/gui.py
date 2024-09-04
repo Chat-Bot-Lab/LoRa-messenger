@@ -1,6 +1,8 @@
 import getpass
+import json
 import logging
 import sys
+from json import JSONDecodeError
 
 from PyQt6 import uic
 from PyQt6.QtCore import QIODevice, QTimer
@@ -68,23 +70,34 @@ class LoRaMessenger(QMainWindow):
         else:
             data = self.serial.readLine()
             if data:
-                str_data = data.data().decode().strip()
-                log.info("Получено сообщение <<< %s >>>", str_data)
-                decrypted_data = decrypt(str_data)
+                try:
+                    str_data = data.data().decode().strip()
+                    json_data = json.loads(str_data)
+                    username = json_data["username"]
+                    message = json_data["message"]
+                    log.info("Username: %s, Message: %s", username, message)
+                    self.ui.messageListWidget.addItem(f"{username}: {message}")
+                except JSONDecodeError as e:
+                    log.error("%s. Message is not a json type.", e)
+                    log.info("incomming message %s", str_data)  # noqa
+                    self.ui.messageListWidget.addItem(str_data)
+                except UnicodeDecodeError as e:
+                    log.error("Ошибка кодировки: %s", e)
 
-                self.ui.messageListWidget.addItem(decrypted_data)
             else:
-                pass
+                ...
 
     def sendMessage(self):
         """Отправить сообщение"""
-        message = self.ui.messageInputField.text()
-        encrypted_message = encrypt(message)
+
         if not self.serial.isOpen():
             log.warning("Порт не открыт. Соединение не установлено.")
             return
+
+        message = self.ui.messageInputField.text()
         try:
-            self.serial.write(encrypted_message.encode())
+            # self.serial.write(encrypted_message.encode())
+            self.serial.write(message.encode())
             log.info("Сообщение <<< %s >>> отправлено", message)
             self.ui.messageInputField.clear()
         except Exception as e:
