@@ -45,8 +45,10 @@ class LoRaMessenger(QMainWindow):
         if ports:
             for port in ports:
                 port_list.append(port.portName())
+
         else:
             log.warning("Порты не найдены")
+
         return port_list
 
     def connectSerialPort(self):
@@ -56,6 +58,7 @@ class LoRaMessenger(QMainWindow):
             self.serial.setPortName(self.ui.portList.currentText())
             self.serial.open(QIODevice.OpenModeFlag.ReadWrite)
             log.info("Подключен к порту %s", self.ui.portList.currentText())
+
         except Exception as e:
             log.exception("Ошибка подключения: %s", e)
 
@@ -68,6 +71,7 @@ class LoRaMessenger(QMainWindow):
         """Прочитать данные с порта."""
         if not self.serial.isOpen():
             return
+
         else:
             data = self.serial.readLine()
 
@@ -111,6 +115,7 @@ class LoRaMessenger(QMainWindow):
                     else:
                         log.info("incoming message %s", str_data)
                         self.ui.messageListWidget.addItem(str_data)
+
             else:
                 ...
 
@@ -122,10 +127,12 @@ class LoRaMessenger(QMainWindow):
             return
 
         message = self.ui.messageInputField.text()
+
         try:
             encrypted_message = encrypt(message)
             self.serial.write(encrypted_message.encode())
             log.info("Сообщение <<< %s >>> отправлено", message)
             self.ui.messageInputField.clear()
+
         except Exception as e:
             log.info(e)
