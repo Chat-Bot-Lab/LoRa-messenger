@@ -77,13 +77,12 @@ class LoRaMessenger(QMainWindow):
                     message = json_data["message"]
                     log.info("Username: %s, Message: %s", username, message)
                     self.ui.messageListWidget.addItem(f"{username}: {message}")
+                except UnicodeDecodeError as e:
+                    log.error("Ошибка кодировки: %s", e)
                 except JSONDecodeError as e:
                     log.error("%s. Message is not a json type.", e)
                     log.info("incomming message %s", str_data)  # noqa
                     self.ui.messageListWidget.addItem(str_data)
-                except UnicodeDecodeError as e:
-                    log.error("Ошибка кодировки: %s", e)
-
             else:
                 ...
 
