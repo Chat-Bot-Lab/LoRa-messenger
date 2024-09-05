@@ -14,7 +14,7 @@ void setup()
 {
   Serial.begin(9600);
   ebyteSerial.begin(9600);
-  Serial.print("Готов абонент ");
+  Serial.print("Aбонент ");
   Serial.println(Number);
   Serial.setTimeout(50);
   ebyteSerial.setTimeout(50);
