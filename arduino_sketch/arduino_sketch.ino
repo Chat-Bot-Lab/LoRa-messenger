@@ -1,16 +1,21 @@
 #include <SoftwareSerial.h>
+#include <ArduinoJson.h>
 
 SoftwareSerial ebyteSerial(10, 11); // RX, TX
 
 
 String input;
 String output;
+StaticJsonDocument<1000> jsonDoc;
+String jsonString;
+int Number = 1984;
 
 void setup()
 {
   Serial.begin(9600);
   ebyteSerial.begin(9600);
-  Serial.println("Приемопередатчик готов");
+  Serial.print("Aбонент ");
+  Serial.println(Number);
   Serial.setTimeout(50);
   ebyteSerial.setTimeout(50);
 
@@ -25,13 +30,16 @@ void loop()
 {
   if (ebyteSerial.available()) {
       input = ebyteSerial.readString();
-      Serial.print("Получено:        ");
       Serial.print(input);
     }
     if (Serial.available()) {
       output = Serial.readString();
-      Serial.print("Отправлено: ");
-      Serial.print(output);
-      ebyteSerial.print(output.c_str());
+      jsonDoc["username"] = Number;
+      jsonDoc["message"] = output;
+
+      serializeJson(jsonDoc,Serial);
+      serializeJson(jsonDoc,ebyteSerial);
+      Serial.println();
+      ebyteSerial.println();
     }
 }
